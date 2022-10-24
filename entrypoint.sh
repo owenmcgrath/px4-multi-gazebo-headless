@@ -9,11 +9,9 @@ function show_help {
     echo "(i.e. when running e.g. \`make px4_sitl gazebo_iris__baylands\`)"
     echo ""
     echo "  -h    Show this help"
-    echo "  -x    Sets the number of IRIS quads"
-    echo "  -p    Sets the number of planes"
-    echo "  -v    Sets the number of VTOL"
-    echo "  -r    Sets the number of rovers"
-    echo "  -w    Set the world (default: empty)"
+    echo "  -m    Sets the model of the vehicle to launch"
+    echo "  -n    Sets the mnumber of vehicles to launch"
+    echo "  -i    Sets the px4 start instance"
     echo ""
     echo "  <IP_API> is the IP to which PX4 will send MAVLink on UDP port 14540"
     echo "  <IP_QGC> is the IP to which PX4 will send MAVLink on UDP port 14550"
@@ -25,24 +23,18 @@ OPTIND=1 # Reset in case getopts has been used previously in the shell.
 
 model=iris
 count=3
-instance=0
-world=empty
 
-while getopts "h?v:w:p:r:x:" opt; do
+while getopts "h?w:m:i:n:" opt; do
     case "$opt" in
     h|\?)
         show_help
         exit 0
         ;;
-    v)  vtol=$OPTARG
+    m)  model=$OPTARG
         ;;
-    p)  plane=$OPTARG
-        ;;    
-    r)  rover=$OPTARG
-        ;;    
-    x)  iris=$OPTARG
+    n)  count=$OPTARG
         ;;
-    w)  world=$OPTARG
+    i)  instance=$OPTARG
         ;;
     esac
 done
@@ -73,27 +65,7 @@ fi
 Xvfb :99 -screen 0 1600x1200x24+32 &
 ${SITL_RTSP_PROXY}/build/sitl_rtsp_proxy &
 
-
-LAUNCH_SCRIPT=""
-
-if [ "$iris" -gt "0" ]; then 
-    LAUNCH_SCRIPT+="iris:${iris},"
-fi 
-
-if [ "$plane" -gt "0" ]; then 
-    LAUNCH_SCRIPT+="plane:${plane},"
-fi
-
-if [ "$vtol" -gt "0" ]; then 
-    LAUNCH_SCRIPT+="standard_vtol:${vtol},"
-fi
-
-if [ "$rover" -gt "0" ]; then 
-    LAUNCH_SCRIPT+="rover:${rover},"
-fi
-
-
-echo Tools/gazebo_sitl_multiple_run.sh -w ${world} -s ${LAUNCH_SCRIPT}
+echo Tools/gazebo_sitl_multiple_run.sh -i ${instance} -m ${model} -n ${count}
 source ${WORKSPACE_DIR}/edit_rcS.bash ${IP_API} ${IP_QGC} &&
 cd ${FIRMWARE_DIR} &&
-Tools/gazebo_sitl_multiple_run.sh -w ${world} -s ${LAUNCH_SCRIPT}
+Tools/gazebo_sitl_multiple_run.sh -i ${instance} -m ${model} -n ${count}
