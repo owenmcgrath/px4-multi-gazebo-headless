@@ -83,6 +83,9 @@ Build arguments can be added to the above command line as follows:
 docker build https://github.com/JonasVautherin/px4-gazebo-headless.git#master --build-arg HOME_LAT=37.873350 --build-arg HOME_LON=-122.302525 --build-arg HOME_ALT=20 -t px4-gazebo-headless
 ```
 
+### Multivehicle
+This fork has been configured to work with a custom launcher for multivehicle. The script option for the multivehicle gazebo sim needed to be hacked so that we could separately offset the instances and launch with a common frame. Attempting to launch with multiple frames would not work on v1.12.3, and it appears the script got abandoned on v1.13
+
 ### Troubleshooting
 
 #### I cannot build the image
